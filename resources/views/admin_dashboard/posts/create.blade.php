@@ -211,7 +211,7 @@
 
 	</script>
 
- <script>
+<script>
 	$(document).on('change', '.inputPostTitle', (e) => {
 		e.preventDefault();
 
@@ -241,6 +241,6 @@
 			}
 		})
 	})
- </script>
+</script>
 
 @endsection

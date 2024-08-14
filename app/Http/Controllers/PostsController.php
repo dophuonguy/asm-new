@@ -10,80 +10,54 @@ use Illuminate\Support\Facades\Validator;
 
 class PostsController extends Controller
 {
-    public function show(Post $post)
-    {
-
+    public function show(Post $post){
+        
         $recent_posts = Post::latest()->take(5)->get();
-
-        $categories = Category::where('name', '!=', 'Chưa phân loại')->withCount('posts')->orderBy('created_at', 'DESC')->take(10)->get();
+        
+        $categories  = Category::where('name','!=','Chưa phân loại')->withCount('posts')->orderBy('created_at','DESC')->take(10)->get();
         $tags = Tag::latest()->take(50)->get();
 
         /*----- Lấy ra 4 bài viết mới nhất theo các danh mục khác nhau -----*/
-        $category_unclassified = Category::where('name', 'Chưa phân loại')->first();
+        $category_unclassified = Category::where('name','Chưa phân loại')->first();
 
-        $posts_new = [];
+        $posts_new[0]= Post::latest()->approved()
+                    ->where('category_id','!=', $category_unclassified->id )
+                    ->take(1)->get();
+        $posts_new[1] = Post::latest()->approved()
+                    ->where('category_id','!=', $category_unclassified->id )
+                    ->where('category_id','!=', $posts_new[0][0]->category->id )
+                    ->take(1)->get();
+        $posts_new[2] = Post::latest()->approved()
+                    ->where('category_id','!=', $category_unclassified->id )
+                    ->where('category_id','!=', $posts_new[0][0]->category->id )
+                    ->where('category_id','!=', $posts_new[1][0]->category->id )
+                    ->take(1)->get();
+        $posts_new[3] = Post::latest()->approved()
+                    ->where('category_id','!=', $category_unclassified->id )
+                    ->where('category_id','!=', $posts_new[0][0]->category->id )
+                    ->where('category_id','!=', $posts_new[1][0]->category->id)
+                    ->where('category_id','!=', $posts_new[2][0]->category->id )
+                    ->take(1)->get(); 
 
-        // Bài viết đầu tiên  
-        $posts_new[0] = Post::latest()->approved()
-            ->where('category_id', '!=', $category_unclassified->id)
-            ->take(1)->get();
-
-        // Kiểm tra bài viết thứ nhất  
-        if (!$posts_new[0]->isEmpty()) {
-            // Bài viết thứ hai  
-            $posts_new[1] = Post::latest()->approved()
-                ->where('category_id', '!=', $category_unclassified->id)
-                ->where('category_id', '!=', $posts_new[0][0]->category->id)
-                ->take(1)->get();
-        } else {
-            $posts_new[1] = collect(); // Hoặc xử lý lỗi nếu không có bài viết  
-        }
-
-        // Kiểm tra bài viết thứ hai  
-        if (!$posts_new[1]->isEmpty()) {
-            // Bài viết thứ ba  
-            $posts_new[2] = Post::latest()->approved()
-                ->where('category_id', '!=', $category_unclassified->id)
-                ->where('category_id', '!=', $posts_new[0][0]->category->id)
-                ->where('category_id', '!=', $posts_new[1][0]->category->id)
-                ->take(1)->get();
-        } else {
-            $posts_new[2] = collect(); // Hoặc xử lý lỗi nếu không có bài viết  
-        }
-
-        // Kiểm tra bài viết thứ ba  
-        if (!$posts_new[2]->isEmpty()) {
-            // Bài viết thứ tư  
-            $posts_new[3] = Post::latest()->approved()
-                ->where('category_id', '!=', $category_unclassified->id)
-                ->where('category_id', '!=', $posts_new[0][0]->category->id)
-                ->where('category_id', '!=', $posts_new[1][0]->category->id)
-                ->where('category_id', '!=', $posts_new[2][0]->category->id)
-                ->take(1)->get();
-        } else {
-            $posts_new[3] = collect(); // Hoặc xử lý lỗi nếu không có bài viết  
-        }
-
-        // Bài viết tương tự   
-        $postTheSame = Post::latest()->approved()
-            ->where('category_id', $post->category->id)
-            ->where('id', '!=', $post->id)
-            ->take(5)->get();
+        
+        // Bài viết tương tự 
+        $postTheSame = Post::latest()->approved()->where('category_id', $post->category->id)->where('id', '!=' , $post->id)->take(5)->get(); ;
+        
 
         // Bài viết nổi bật
-        $outstanding_posts = Post::approved()->where('category_id', '!=', $category_unclassified->id)->take(5)->get();
-
+        $outstanding_posts = Post::approved()->where('category_id', '!=',  $category_unclassified->id )->take(5)->get();
+        
         // Tăng lượt xem khi xem bài viết
-        $post->views = ($post->views) + 1;
+        $post->views =  ($post->views) + 1;
         $post->save();
 
-        return view('post', [
+        return view('post', [ 
             'post' => $post,
             'recent_posts' => $recent_posts,
-            'categories' => $categories,
+            'categories' => $categories, 
             'tags' => $tags,
             'posts_new' => $posts_new,
-            'postTheSame' => $postTheSame, // Bài viết tương tự
+            'postTheSame' =>  $postTheSame, // Bài viết tương tự
             'outstanding_posts' => $outstanding_posts, // bài viết xu hướng
         ]);
     }
@@ -91,8 +65,7 @@ class PostsController extends Controller
     public function addComment(Post $post)
     {
         $attributes = request()->validate([
-            'the_comment' => 'required|min:5|max:300'
-        ]);
+            'the_comment' => 'required|min:5|max:300']);
 
         $attributes['user_id'] = auth()->id();
 
@@ -103,8 +76,7 @@ class PostsController extends Controller
 
     }
 
-    public function addCommentUser()
-    {
+    public function addCommentUser(){
         $data = array();
         $data['success'] = 0;
         $data['errors'] = [];
@@ -114,19 +86,19 @@ class PostsController extends Controller
             'post_title' => 'required',
         ];
 
-        $validated = Validator::make(request()->all(), $rules);
+        $validated = Validator::make( request()->all(), $rules);
 
-        if ($validated->fails()) {
+        if($validated->fails()){
             $data['errors'] = $validated->errors()->first('the_comment');
-
+      
             $data['message'] = "Khổng thể bình luận";
 
-        } else {
+        }else{
             $attributes = $validated->validated();
             $post = Post::where('title', $attributes['post_title'])->first();
 
-            $comment['the_comment'] = $attributes['the_comment'];
-            $comment['post_id'] = $post->id;
+            $comment['the_comment'] = $attributes['the_comment']; 
+            $comment['post_id'] = $post->id ; 
             $comment['user_id'] = auth()->id();
 
             $post->comments()->create($comment);
@@ -135,11 +107,11 @@ class PostsController extends Controller
             $data['message'] = "Bạn đã bình luận thành công !";
             $data['result'] = $comment;
         }
-
+  
         return response()->json($data);
     }
 
+    
 
-
-
+   
 }

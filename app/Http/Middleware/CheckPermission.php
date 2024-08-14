@@ -16,7 +16,6 @@ class CheckPermission
         // 1. Lấy tên điều hướng 
         $route_name = $request->route()->getName();
 
-        
         // 2. Xác thực người nhận quyền của mình
         $route_arr = auth()->user()->role->permissions->toArray();
 

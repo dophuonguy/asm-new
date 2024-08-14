@@ -14,16 +14,16 @@
 							<div class="col-md-12">
 								<div class="contact-info-wrap-flex">
 									<div class="con-info">
-										<p><span><i class="icon-location-2"></i></span> Trần Bình, Phường Mai Dịch <br>Cầu Giấy, TP. Hà Nội</p>
+										<p><span><i class="icon-location-2"></i></span> E1, Khu Công Nghệ Cao, <br>Hiệp Phú, TP. Thủ Đức</p>
 									</div>
 									<div class="con-info">
-										<p><span><i class="icon-phone3"></i></span> <a href="tel://1234567920">(+84) 976 562 034</a></p>
+										<p><span><i class="icon-phone3"></i></span> <a href="tel://1234567920">(+84) 392 766 630</a></p>
 									</div>
 									<div class="con-info">
-										<p><span><i class="icon-paperplane"></i></span> <a href="mailto:hutechnews@gmail.com">dophuonguy1209@gmail.com</a></p>
+										<p><span><i class="icon-paperplane"></i></span> <a href="mailto:hutechnews@gmail.com">tdqnews@gmail.com</a></p>
 									</div>
 									<div class="con-info">
-										<p><span><i class="icon-globe"></i></span> <a href="#">reader.vn</a></p>
+										<p><span><i class="icon-globe"></i></span> <a href="#">hoanhtuan.nam.vn</a></p>
 									</div>
 								</div>
 							</div>
